@@ -11,7 +11,7 @@ const getTimeObject = function (timeString) {
 const dayNumber = new Map([
   ["Mon", 0],
   ["Tue", 1],
-  ["wed", 2],
+  ["Wed", 2],
   ["Thu", 3],
   ["Fri", 4],
   ["Sat", 5],
@@ -38,8 +38,9 @@ const compareTime = function (time1, time2) {
 const getShopStatus = function (dayString, timeString, phase) {
   const day = dayNumber.get(dayString);
   const time = getTimeObject(timeString);
-  const shopScheduleForDay = getShopSchedule()[day];
-  if (phase === 1) {
+  const shopSchedule = getShopSchedule();
+  const shopScheduleForDay = shopSchedule[day];
+  if (phase === "phase1") {
     if (
       shopScheduleForDay !== undefined &&
       compareTime(shopScheduleForDay.open, time) <= 0 &&
@@ -49,7 +50,40 @@ const getShopStatus = function (dayString, timeString, phase) {
     } else {
       console.log("Close");
     }
-  } else if (phase === 2) {
+  } else if (phase === "phase2") {
+    if (
+      shopScheduleForDay !== undefined &&
+      compareTime(shopScheduleForDay.open, time) <= 0 &&
+      compareTime(shopScheduleForDay.close, time) >= 0
+    ) {
+      let hours = compareTime(shopScheduleForDay.close, time);
+      console.log(
+        `Open, The shop will be closed within ${hours.toFixed(2)} Hrs`
+      );
+    } else {
+      let hours;
+      if (
+        shopScheduleForDay !== undefined &&
+        compareTime(shopScheduleForDay.open, time) > 0
+      ) {
+        hours = compareTime(shopScheduleForDay.open, time);
+      } else {
+        let nextOpenDay = day + 1;
+        for (let i = 0; i < 7; i++) {
+          if (shopSchedule[nextOpenDay % 7] !== undefined) break;
+          nextOpenDay++;
+        }
+        console.log(nextOpenDay);
+        hours =
+          compareTime(shopSchedule[nextOpenDay % 7].open, time) +
+          Math.abs(nextOpenDay - day) * 24;
+      }
+
+      console.log(
+        `Closed. The shop will be open after ${hours.toFixed(2)} Hrs`
+      );
+    }
+  } else if (phase === "phase3") {
   }
 };
 
@@ -86,5 +120,5 @@ const questions = [
 ];
 
 inquirer.prompt(questions).then((answer) => {
-  getShopStatus(answer.Day, answer.CURRENT_TIME, 1);
+  getShopStatus(answer.Day, answer.CURRENT_TIME, answer.phase);
 });
