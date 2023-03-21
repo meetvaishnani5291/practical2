@@ -21,7 +21,7 @@ const questions = [
         hour12: true,
       });
 
-      return defaultDate.slice(0, 5) + " " + defaultDate.slice(-2);
+      return defaultDate.slice(0, -3) + " " + defaultDate.slice(-2);
     },
     validate(time) {
       const regex = /^(1[012]|[1-9]|0[1-9]):[0-5][0-9](\s)(AM|PM)$/i;
